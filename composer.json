@@ -1,0 +1,14 @@
+{
+    "name": "satukes/dashboard-terpadu",
+    "description": "Dashboard monitoring fasilitas kesehatan multi-faskes berbasis CodeIgniter 3",
+    "license": "proprietary",
+    "type": "project",
+    "require": {
+        "php": ">=8.2",
+        "ext-curl": "*",
+        "ext-mbstring": "*",
+        "ext-mysqli": "*",
+        "ext-openssl": "*",
+        "codeigniter/framework": "3.1.13"
+    }
+}
