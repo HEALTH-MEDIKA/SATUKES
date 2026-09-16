@@ -71,6 +71,49 @@ Persyaratan: PHP 8.2 dengan `curl`, `openssl`, `mbstring`, dan `mysqli`; MySQL/M
 
 Jika `mod_rewrite` tidak aktif, set `index_page` kembali ke `index.php` dan gunakan URL `http://localhost/SATUKES/index.php/login`.
 
+## Deployment cPanel (`satukes.healthmedika.cloud`)
+
+Atur document root subdomain ke direktori yang berisi `index.php`. Struktur minimum
+di server harus seperti berikut (jangan mengunggah isi folder tanpa `vendor`):
+
+```text
+<document-root>/
+|-- index.php
+|-- .htaccess
+|-- application/
+`-- vendor/codeigniter/framework/system/
+```
+
+Dependency CodeIgniter disertakan dalam repository supaya deployment melalui Git
+atau File Manager tetap dapat berjalan ketika Composer/SSH tidak tersedia. Jika
+memilih tidak mengunggah `vendor`, jalankan perintah berikut dari direktori yang
+sama dengan `index.php`:
+
+```bash
+composer install --no-dev --optimize-autoloader
+```
+
+Path framework di `index.php` dihitung dari `__DIR__`, sehingga tidak perlu memakai
+path absolut `/home/...` yang berbeda untuk setiap akun cPanel.
+
+Atur environment melalui menu **Software > MultiPHP INI Editor**, konfigurasi
+Apache cPanel, atau fasilitas environment hosting. Nilai minimum production:
+
+```text
+CI_ENV=production
+APP_BASE_URL=https://satukes.healthmedika.cloud/
+APP_KEY=<acak-minimal-32-karakter>
+FASKES_SECRET_MASTER_KEY=<acak-minimal-32-karakter-yang-berbeda>
+DB_HOST=localhost
+DB_NAME=<nama-database-cpanel>
+DB_USER=<user-database-cpanel>
+DB_PASS=<password-database-cpanel>
+```
+
+Setelah deploy, pastikan permission direktori `application/cache` dan
+`application/logs` mengizinkan proses PHP menulis (umumnya `0755`, atau sesuai
+konfigurasi PHP handler hosting). Jangan memakai permission `0777`.
+
 ### Memperbarui instalasi yang sudah ada
 
 Jalankan migrasi tanpa membuat ulang pengguna admin:

@@ -1,4 +1,5 @@
-/vendor/
+# CodeIgniter is intentionally committed so a cPanel deployment made from the
+# repository works even when Composer/SSH is unavailable on the hosting account.
 /application/cache/*
 !/application/cache/index.html
 /application/logs/*
