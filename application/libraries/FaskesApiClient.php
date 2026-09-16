@@ -2,6 +2,17 @@
 
 class FaskesApiClient
 {
+    private $catalogPaths = array(
+        'referred' => '/api/v1/monitoring/kunjungan/dirujuk',
+        'patient_status' => '/api/v1/monitoring/kunjungan/pasien-baru-lama',
+        'payment_methods' => '/api/v1/monitoring/kunjungan/cara-bayar',
+        'diagnoses' => '/api/v1/monitoring/kunjungan/diagnosa-terbanyak',
+        'medicines' => '/api/v1/monitoring/kunjungan/obat-terbanyak',
+        'outpatient' => '/api/v1/monitoring/kunjungan/rawat-jalan',
+        'inpatient' => '/api/v1/monitoring/kunjungan/rawat-inap',
+        'emergency' => '/api/v1/monitoring/kunjungan/gawat-darurat',
+    );
+
     private function uuid()
     {
         $d = random_bytes(16); $d[6] = chr((ord($d[6]) & 0x0f) | 0x40); $d[8] = chr((ord($d[8]) & 0x3f) | 0x80);
@@ -72,5 +83,24 @@ class FaskesApiClient
         $auth = $this->request($branch, '/api/v1/auth/token', $secret, NULL);
         if (empty($auth['access_token'])) throw new RuntimeException('API tidak mengembalikan access token.');
         return $this->request($branch, '/api/v1/monitoring/kunjungan/summary', $secret, array('date_from'=>$from, 'date_to'=>$to), $auth['access_token']);
+    }
+
+    /**
+     * Fetch all visit catalog metrics with one access token.
+     *
+     * The returned array is keyed by a stable local name so callers do not
+     * have to depend on the API's human-readable catalog labels.
+     */
+    public function visitCatalog($branch, $secret, $from, $to)
+    {
+        $auth = $this->request($branch, '/api/v1/auth/token', $secret, NULL);
+        if (empty($auth['access_token'])) throw new RuntimeException('API tidak mengembalikan access token.');
+
+        $payload = array('date_from'=>$from, 'date_to'=>$to);
+        $result = array();
+        foreach ($this->catalogPaths as $key => $path) {
+            $result[$key] = $this->request($branch, $path, $secret, $payload, $auth['access_token']);
+        }
+        return $result;
     }
 }

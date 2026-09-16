@@ -8,7 +8,7 @@ MVP agregator kunjungan multi-faskes menggunakan CodeIgniter 3.1.13, Tabler 1.4.
 - RBAC empat peran serta assignment faskes per pengguna.
 - Daftar/tambah/ubah faskes, health check, dan sinkronisasi manual.
 - Konektor API Sistem Informasi Faskes v1 dengan HKDF, HMAC-SHA256, Bearer token, dan AES-256-GCM.
-- Dashboard responsif: total, rata-rata, tren harian, dan kontribusi faskes.
+- Dashboard responsif: total, pasien baru/lama, rawat jalan/inap, gawat darurat, rujukan, tren harian, dan kontribusi faskes.
 - Sinkronisasi CLI terjadwal, audit log, dan skema database lengkap.
 
 PRD lengkap: [`docs/PRD_DASHBOARD_TERPADU.md`](docs/PRD_DASHBOARD_TERPADU.md).
@@ -98,7 +98,7 @@ Siapkan dari sistem informasi faskes:
 - Base URL tanpa `/api/v1`;
 - `cons_id` unik;
 - `secret_key` minimal 32 karakter;
-- endpoint `/api/v1/health`, `/api/v1/auth/token`, dan `/api/v1/monitoring/kunjungan/summary`.
+- endpoint `/api/v1/health`, `/api/v1/auth/token`, serta delapan endpoint katalog pada `docs/README_API_CATALOG_MONITORING.md`.
 
 Setelah disimpan, tekan **Tes** kemudian **Sinkron**. Secret lama tidak pernah dikirim kembali ke browser. Mengisi secret baru pada halaman ubah akan merotasi secret faskes yang disimpan oleh SATUKES.
 

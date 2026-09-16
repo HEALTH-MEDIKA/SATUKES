@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "5286de87-4968-4bf9-a643-11368e035266",
-    "name": "Faskes Monitoring API v1 - Web Crypto",
-    "description": "Collection pengujian REST API Monitoring Faskes tanpa package NPM. Script memakai Web Crypto bawaan Postman untuk HKDF-SHA256, HMAC-SHA256, dan AES-256-GCM. Isi base_url, cons_id, dan secret_key pada environment sebelum menjalankan request.",
+    "name": "HIS Monitoring API v1 - Web Crypto",
+    "description": "Collection pengujian REST API Monitoring Klinik dan katalog statistik tanpa package NPM. Script memakai Web Crypto bawaan Postman untuk HKDF-SHA256, HMAC-SHA256, dan AES-256-GCM. Isi base_url, cons_id, dan secret_key pada environment sebelum menjalankan request.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "event": [
@@ -17,7 +17,7 @@
           "    const secret = String(pm.environment.get('secret_key') || '');",
           "",
           "    if (!consId || !secret) {",
-          "        throw new Error('Isi cons_id dan secret_key pada environment Faskes Monitoring API terlebih dahulu.');",
+          "        throw new Error('Isi cons_id dan secret_key pada environment HIS Monitoring API terlebih dahulu.');",
           "    }",
           "    if (secret.length < 32) {",
           "        throw new Error('secret_key tidak valid: panjang minimal 32 karakter.');",
@@ -27,7 +27,18 @@
           "    }",
           "",
           "    const resolvedUrl = pm.variables.replaceIn(pm.request.url.toString()).split('?')[0].replace(/\\/$/, '');",
-          "    const supportedPaths = ['/api/v1/auth/token', '/api/v1/monitoring/kunjungan/summary'];",
+          "    const supportedPaths = [",
+          "        '/api/v1/auth/token',",
+          "        '/api/v1/monitoring/kunjungan/summary',",
+          "        '/api/v1/monitoring/kunjungan/dirujuk',",
+          "        '/api/v1/monitoring/kunjungan/pasien-baru-lama',",
+          "        '/api/v1/monitoring/kunjungan/cara-bayar',",
+          "        '/api/v1/monitoring/kunjungan/diagnosa-terbanyak',",
+          "        '/api/v1/monitoring/kunjungan/obat-terbanyak',",
+          "        '/api/v1/monitoring/kunjungan/rawat-jalan',",
+          "        '/api/v1/monitoring/kunjungan/rawat-inap',",
+          "        '/api/v1/monitoring/kunjungan/gawat-darurat'",
+          "    ];",
           "    const canonicalPath = supportedPaths.find(function (path) { return resolvedUrl.endsWith(path); });",
           "    if (!canonicalPath) {",
           "        throw new Error('Canonical path tidak dikenali: ' + resolvedUrl);",
@@ -85,7 +96,7 @@
           "    };",
           "",
           "    let rawBody = '{}';",
-          "    if (canonicalPath === '/api/v1/monitoring/kunjungan/summary') {",
+          "    if (canonicalPath !== '/api/v1/auth/token') {",
           "        const today = new Date();",
           "        const sixDaysAgo = new Date(today.getTime());",
           "        sixDaysAgo.setDate(today.getDate() - 6);",
@@ -197,8 +208,9 @@
           "            pm.expect(decrypted.access_token).to.be.a('string').and.not.empty;",
           "        });",
           "    } else {",
-          "        pm.test('Total kunjungan tersedia', function () {",
-          "            pm.expect(decrypted.metrics.total_visits).to.be.a('number');",
+          "        pm.test('Metrik katalog tersedia', function () {",
+          "            pm.expect(decrypted.catalog).to.be.an('object');",
+          "            pm.expect(decrypted.metrics).to.be.an('object');",
           "        });",
           "    }",
           "",
@@ -286,6 +298,99 @@
         "description": "Payload tanggal dienkripsi otomatis. Jika tanggal kosong, memakai tujuh hari terakhir. Response didekripsi pada Visualize dan disimpan pada last_decrypted_response."
       },
       "response": []
+    },
+    {
+      "name": "4. Katalog Monitoring",
+      "item": [
+        {
+          "name": "Pasien Dirujuk",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"date_from\": \"{{date_from}}\",\n  \"date_to\": \"{{date_to}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{base_url}}/api/v1/monitoring/kunjungan/dirujuk", "host": ["{{base_url}}"], "path": ["api", "v1", "monitoring", "kunjungan", "dirujuk"] },
+            "description": "Mengambil total pasien dengan stts Dirujuk dalam periode tanggal."
+          },
+          "response": []
+        },
+        {
+          "name": "Pasien Baru dan Lama",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"date_from\": \"{{date_from}}\",\n  \"date_to\": \"{{date_to}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{base_url}}/api/v1/monitoring/kunjungan/pasien-baru-lama", "host": ["{{base_url}}"], "path": ["api", "v1", "monitoring", "kunjungan", "pasien-baru-lama"] },
+            "description": "Mengambil total pasien berdasarkan status_poli Baru dan Lama."
+          },
+          "response": []
+        },
+        {
+          "name": "Pasien Berdasarkan Cara Bayar",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"date_from\": \"{{date_from}}\",\n  \"date_to\": \"{{date_to}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{base_url}}/api/v1/monitoring/kunjungan/cara-bayar", "host": ["{{base_url}}"], "path": ["api", "v1", "monitoring", "kunjungan", "cara-bayar"] },
+            "description": "Mengambil total pasien per kode dan nama cara bayar."
+          },
+          "response": []
+        },
+        {
+          "name": "10 Diagnosa Terbanyak",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"date_from\": \"{{date_from}}\",\n  \"date_to\": \"{{date_to}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{base_url}}/api/v1/monitoring/kunjungan/diagnosa-terbanyak", "host": ["{{base_url}}"], "path": ["api", "v1", "monitoring", "kunjungan", "diagnosa-terbanyak"] },
+            "description": "Mengambil sepuluh diagnosa dengan pasien terbanyak."
+          },
+          "response": []
+        },
+        {
+          "name": "10 Obat Terbanyak",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"date_from\": \"{{date_from}}\",\n  \"date_to\": \"{{date_to}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{base_url}}/api/v1/monitoring/kunjungan/obat-terbanyak", "host": ["{{base_url}}"], "path": ["api", "v1", "monitoring", "kunjungan", "obat-terbanyak"] },
+            "description": "Mengambil sepuluh obat dengan jumlah pemberian terbesar."
+          },
+          "response": []
+        },
+        {
+          "name": "Kunjungan Rawat Jalan",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"date_from\": \"{{date_from}}\",\n  \"date_to\": \"{{date_to}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{base_url}}/api/v1/monitoring/kunjungan/rawat-jalan", "host": ["{{base_url}}"], "path": ["api", "v1", "monitoring", "kunjungan", "rawat-jalan"] },
+            "description": "Mengambil total kunjungan selain poli IGD/IGDK dan selain status lanjut Ranap."
+          },
+          "response": []
+        },
+        {
+          "name": "Kunjungan Rawat Inap",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"date_from\": \"{{date_from}}\",\n  \"date_to\": \"{{date_to}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{base_url}}/api/v1/monitoring/kunjungan/rawat-inap", "host": ["{{base_url}}"], "path": ["api", "v1", "monitoring", "kunjungan", "rawat-inap"] },
+            "description": "Mengambil total kunjungan dengan status_lanjut Ranap."
+          },
+          "response": []
+        },
+        {
+          "name": "Pasien Gawat Darurat",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"date_from\": \"{{date_from}}\",\n  \"date_to\": \"{{date_to}}\"\n}", "options": { "raw": { "language": "json" } } },
+            "url": { "raw": "{{base_url}}/api/v1/monitoring/kunjungan/gawat-darurat", "host": ["{{base_url}}"], "path": ["api", "v1", "monitoring", "kunjungan", "gawat-darurat"] },
+            "description": "Mengambil total pasien pada poli IGD atau IGDK."
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }

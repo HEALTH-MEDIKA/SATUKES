@@ -100,7 +100,9 @@ switch (ENVIRONMENT)
  * This variable must contain the name of your "system" directory.
  * Set the path if it is not in the same directory as this file.
  */
-	$system_path = 'vendor/codeigniter/framework/system';
+	// Resolve from this front controller so it also works when the web server's
+	// working directory is different from the project directory.
+	$system_path = __DIR__.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'codeigniter'.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'system';
 
 /*
  *---------------------------------------------------------------
